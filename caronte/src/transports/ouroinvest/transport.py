@@ -18,7 +18,7 @@ class OuroInvestApiTransport:
     @classmethod
     async def execute_get_with_user_token(cls, url: str, user_id: int, body: dict = None) -> ClientResponse:
         if body:  # Note: In one endpoint of the supplier, it requires a JSON body in an HTTP GET.
-            body.update(cls._get_controle())
+            body.update(cls._get_control())
         token = await cls._get_user_token(user_id)
         headers = cls._get_auth(token)
         response = await cls._request_method_get(url, headers, body)
@@ -26,7 +26,7 @@ class OuroInvestApiTransport:
 
     @classmethod
     async def execute_post_with_default_token(cls, url: str, body: dict) -> ClientResponse:
-        body.update(cls._get_controle())
+        body.update(cls._get_control())
         token = await cls._get_token()
         headers = cls._get_auth(token)
         response = await cls._request_method_post(url, body, headers)
@@ -34,14 +34,14 @@ class OuroInvestApiTransport:
 
     @classmethod
     async def execute_post_with_user_token(cls, url: str, user_id: int, body: dict) -> ClientResponse:
-        body.update(cls._get_controle())
+        body.update(cls._get_control())
         token = await cls._get_user_token(user_id)
         headers = cls._get_auth(token)
         response = await cls._request_method_post(url, body, headers)
         return response
 
     @staticmethod
-    def _get_controle():
+    def _get_control():
         controle = {"controle": {
             "dataHoraCliente": config("OUROINVEST_CONTROLE_DATAHORACLIENTE"),  # TODO: Estudar se será um datetime.now()
             "recurso": {
@@ -84,7 +84,7 @@ class OuroInvestApiTransport:
     async def __request_new_token(cls) -> str:
         body = {
             "chave": config("OUROINVEST_SYSTEM_USER"), "senha": config("OUROINVEST_SYSTEM_PWD"),
-            **cls._get_controle()
+            **cls._get_control()
         }
         url = config("OUROINVEST_DEFAULT_TOKEN_URL")
         response = await cls._request_method_post(url, body=body)
@@ -94,7 +94,7 @@ class OuroInvestApiTransport:
 
     @classmethod
     async def __request_new_user_token(cls, client_code: int, token: str) -> str:
-        body = {"codigoCliente": client_code, **cls._get_controle()}
+        body = {"codigoCliente": client_code, **cls._get_control()}
         url = config("OUROINVEST_USER_TOKEN_URL")
         response = await cls._request_method_post(url, body=body, headers=cls._get_auth(token))
         user_token_json = await response.json()
@@ -102,14 +102,14 @@ class OuroInvestApiTransport:
         return user_token
 
     @classmethod
-    async def __get_session(cls) -> ClientSession:
+    async def _get_session(cls) -> ClientSession:
         if cls.session is None:
             cls.session = ClientSession()
         return cls.session
 
     @classmethod
     async def _request_method_get(cls, url: str, headers: dict, body: dict = None) -> ClientResponse:
-        session = await cls.__get_session()
+        session = await cls._get_session()
         response = await session.get(url, headers=headers, json=body)
         if response.status == 403:
             token_cache_key = config("OUROINVEST_BASE_TOKENS_CACHE_FOLDER")+config("OUROINVEST_DEFAULT_TOKEN_CACHE_KEY")
@@ -120,7 +120,7 @@ class OuroInvestApiTransport:
 
     @classmethod
     async def _request_method_post(cls, url: str, body: dict, headers: dict = None) -> ClientResponse:
-        session = await cls.__get_session()
+        session = await cls._get_session()
         response = await session.post(url, headers=headers, json=body)
         if response.status == 403:
             token_cache_key = config("OUROINVEST_BASE_TOKENS_CACHE_FOLDER")+config("OUROINVEST_DEFAULT_TOKEN_CACHE_KEY")

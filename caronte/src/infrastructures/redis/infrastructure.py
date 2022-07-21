@@ -1,15 +1,13 @@
-# OUTSIDE LIBRARIES
 import aioredis
+from caronte.src.infrastructures.env_config import config
 
 
 class RedisInfrastructure:
     __redis = None
-    redis_host = None
-    redis_db = None
 
     @classmethod
     def get_redis(cls):
         if cls.__redis is None:
-            url = f"{cls.redis_host}?db={cls.redis_db}"
+            url = f'{config("CARONTE_REDIS_HOST")}?db={config("CARONTE_REDIS_DB")}'
             cls.__redis = aioredis.from_url(url)
         return cls.__redis
