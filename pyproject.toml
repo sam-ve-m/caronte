@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "caronte"
+version = "0.0.0"
+description = ""
+authors = ["Sam <svm@lionx.com.br>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+aiohttp = "^3.8.1"
+etria-logger = "^0.1.9"
+orjson = "^3.6.8"
+nidavellir = "0.1.0"
+python-decouple = "^3.6"
+aioredis = "^2.0.1"
+
+[tool.poetry.dev-dependencies]
+
+
+[[tool.poetry.source]]
+name = "etria_logger"
+url = "https://nexus.sigame.com.br/repository/pypi/simple/"
+
+[[tool.poetry.source]]
+name = "nidavellir"
+url = "https://nexus.sigame.com.br/repository/pypi/simple/"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
