@@ -21,7 +21,7 @@ class OuroInvestApiTransport:
             body.update(cls._get_control())
         token = await cls._get_user_token(user_id)
         headers = cls._get_auth(token)
-        response = await cls._request_method_get(url, headers, body)
+        response = await cls._request_method_get(url, headers, body, user_id)
         return response
 
     @classmethod
@@ -37,7 +37,7 @@ class OuroInvestApiTransport:
         body.update(cls._get_control())
         token = await cls._get_user_token(user_id)
         headers = cls._get_auth(token)
-        response = await cls._request_method_post(url, body, headers)
+        response = await cls._request_method_post(url, body, headers, user_id)
         return response
 
     @staticmethod
@@ -108,23 +108,27 @@ class OuroInvestApiTransport:
         return cls.session
 
     @classmethod
-    async def _request_method_get(cls, url: str, headers: dict, body: dict = None) -> ClientResponse:
+    async def _request_method_get(cls, url: str, headers: dict,
+                                  body: dict = None, user_id: int = None) -> ClientResponse:
         session = await cls._get_session()
         response = await session.get(url, headers=headers, json=body)
         if response.status == 403:
             token_cache_key = config("OUROINVEST_BASE_TOKENS_CACHE_FOLDER")+config("OUROINVEST_DEFAULT_TOKEN_CACHE_KEY")
             await cls.cache.delete(token_cache_key)
-            return await cls._request_method_get(url, cls._get_auth(await cls._get_token()), body)
+            token = await cls._get_user_token(user_id) if user_id is not None else await cls._get_token()
+            return await cls._request_method_get(url, cls._get_auth(token), body)
         response.raise_for_status()
         return response
 
     @classmethod
-    async def _request_method_post(cls, url: str, body: dict, headers: dict = None) -> ClientResponse:
+    async def _request_method_post(cls, url: str, body: dict,
+                                   headers: dict = None, user_id: int = None) -> ClientResponse:
         session = await cls._get_session()
         response = await session.post(url, headers=headers, json=body)
         if response.status == 403:
             token_cache_key = config("OUROINVEST_BASE_TOKENS_CACHE_FOLDER")+config("OUROINVEST_DEFAULT_TOKEN_CACHE_KEY")
             await cls.cache.delete(token_cache_key)
-            return await cls._request_method_post(url, body, cls._get_auth(await cls._get_token()))
+            token = await cls._get_user_token(user_id) if user_id is not None else await cls._get_token()
+            return await cls._request_method_post(url, body, cls._get_auth(token))
         response.raise_for_status()
         return response

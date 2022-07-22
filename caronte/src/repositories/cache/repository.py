@@ -32,4 +32,4 @@ class Cache(RedisInfrastructure):
         redis = cls.get_redis()
         keys_in_folder = redis.scan_iter(match=f"{cls.prefix}{folder}:*")
         async for key in keys_in_folder:
-            await cls.delete(key)
+            await redis.delete(key)

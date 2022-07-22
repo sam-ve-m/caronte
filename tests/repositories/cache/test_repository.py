@@ -68,11 +68,10 @@ async def test_delete(mocked_get_redis, monkeypatch):
 
 @pytest.mark.asyncio
 @patch.object(Cache, "get_redis", return_value=fake_redis)
-@patch.object(Cache, "delete")
-async def test_delete_folder(mocked_delete, mocked_get_redis, monkeypatch):
+async def test_delete_folder(mocked_get_redis, monkeypatch):
     monkeypatch.setattr(Cache, "prefix", dummy_prefix)
     fake_redis.scan_iter = MagicMock(return_value=create_async_iterable_object([dummy_key]))
     await Cache.delete_folder(dummy_key)
     mocked_get_redis.assert_called_once_with()
     fake_redis.scan_iter.assert_called_once_with(match=dummy_prefix_folder)
-    mocked_delete.assert_called_once_with(dummy_key)
+    fake_redis.delete.assert_called_with(dummy_key)
