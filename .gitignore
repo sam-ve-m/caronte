@@ -15,6 +15,7 @@ venv/
 
 # Compiled Python bytecode
 *.py[cod]
+*.pyc
 
 # Log files
 *.log
