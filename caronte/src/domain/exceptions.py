@@ -1,0 +1,2 @@
+class OuroInvestErrorReturn(Exception):
+    pass

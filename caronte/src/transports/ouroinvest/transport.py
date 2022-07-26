@@ -1,5 +1,6 @@
 from aiohttp import ClientSession, ClientResponse
 
+from caronte import OuroInvestErrorReturn
 from caronte.src.infrastructures.env_config import config
 from caronte.src.repositories.cache.repository import Cache
 
@@ -117,7 +118,7 @@ class OuroInvestApiTransport:
             await cls.cache.delete(token_cache_key)
             token = await cls._get_user_token(user_id) if user_id is not None else await cls._get_token()
             return await cls._request_method_get(url, cls._get_auth(token), body)
-        response.raise_for_status()
+        await cls._raise_for_status(response)
         return response
 
     @classmethod
@@ -130,5 +131,14 @@ class OuroInvestApiTransport:
             await cls.cache.delete(token_cache_key)
             token = await cls._get_user_token(user_id) if user_id is not None else await cls._get_token()
             return await cls._request_method_post(url, body, cls._get_auth(token))
-        response.raise_for_status()
+        await cls._raise_for_status(response)
         return response
+
+    @staticmethod
+    async def _raise_for_status(response):
+        if not response.ok:
+            message = await response.content.read()
+            raise OuroInvestErrorReturn(f"Status: {response.status};\n"
+                                        f"Reason: {response.reason};\n"
+                                        f"Content: {message.decode()}.")
+
