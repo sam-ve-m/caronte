@@ -1,11 +1,13 @@
 from typing import Optional, Union
 
 import orjson
+
+from caronte.src.infrastructures.env_config import config
 from caronte.src.infrastructures.redis.infrastructure import RedisInfrastructure
 
 
 class Cache(RedisInfrastructure):
-    prefix = "caronte:"
+    prefix = config("CARONTE_CACHE_KEYS_PREFIX")
 
     @classmethod
     async def set(cls, key: str, value: Union[dict, str], ttl: int = None):

@@ -8,7 +8,8 @@ from tests.test_utils.utils import create_async_iterable_object
 
 with patch.object(RepositoryEnv, "__init__", return_value=None):
     with patch.object(Config, "__init__", return_value=None):
-        from caronte.src.repositories.cache.repository import Cache
+        with patch.object(Config, "__call__", return_value="ENV_VALUE{}"):
+            from caronte.src.repositories.cache.repository import Cache
 
 
 dummy_key = "key"
