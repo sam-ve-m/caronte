@@ -327,5 +327,6 @@ async def test_raise_for_status():
 async def test_raise_for_status_raising():
     stub_response = MagicMock(ok=False)
     stub_response.content.read = AsyncMock()
+    stub_response.content.read.return_value.decode = MagicMock
     with pytest.raises(OuroInvestErrorReturn):
         await OuroInvestApiTransport._raise_for_status(stub_response)
