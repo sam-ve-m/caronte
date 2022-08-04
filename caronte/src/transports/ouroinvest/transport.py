@@ -70,8 +70,8 @@ class OuroInvestApiTransport:
         return {"Authorization": f"Bearer {token}"}
 
     _base_tokens_cache_folder = config("OUROINVEST_BASE_TOKENS_CACHE_FOLDER")
-    _default_token_cache_key = _base_tokens_cache_folder+config("OUROINVEST_DEFAULT_TOKEN_CACHE_KEY")
-    _user_token_cache_key_format = _base_tokens_cache_folder+config("OUROINVEST_USER_TOKEN_CACHE_KEY")
+    _default_token_cache_key = _base_tokens_cache_folder + config("OUROINVEST_DEFAULT_TOKEN_CACHE_KEY")
+    _user_token_cache_key_format = _base_tokens_cache_folder + config("OUROINVEST_USER_TOKEN_CACHE_KEY")
 
     @classmethod
     async def _get_token(cls) -> str:
@@ -121,27 +121,29 @@ class OuroInvestApiTransport:
             cls.session = ClientSession()
         return cls.session
 
+    MAX_RETRY = config("CARONTE_MAX_RETRY")
+
     @classmethod
-    async def _request_method_get(cls, url: str, headers: dict,
-                                  body: dict = None, user_id: int = None) -> ClientResponse:
+    async def _request_method_get(cls, url: str, headers: dict, body: dict = None,
+                                  user_id: int = None, retry: int = 0) -> ClientResponse:
         session = await cls._get_session()
         response = await session.get(url, headers=headers, json=body)
-        if response.status == HTTPStatus.FORBIDDEN:
+        if response.status == HTTPStatus.FORBIDDEN and retry < int(cls.MAX_RETRY):
             await cls.cache.delete(cls._default_token_cache_key)
             token = await cls._get_user_token(user_id) if user_id is not None else await cls._get_token()
-            return await cls._request_method_get(url, cls._get_auth(token), body)
+            return await cls._request_method_get(url, cls._get_auth(token), body, user_id, retry + 1)
         await cls._raise_for_status(response)
         return response
 
     @classmethod
-    async def _request_method_post(cls, url: str, body: dict,
-                                   headers: dict = None, user_id: int = None) -> ClientResponse:
+    async def _request_method_post(cls, url: str, body: dict, headers: dict = None,
+                                   user_id: int = None, retry: int = 0) -> ClientResponse:
         session = await cls._get_session()
         response = await session.post(url, headers=headers, json=body)
-        if response.status == HTTPStatus.FORBIDDEN:
+        if response.status == HTTPStatus.FORBIDDEN and retry < int(cls.MAX_RETRY):
             await cls.cache.delete(cls._default_token_cache_key)
             token = await cls._get_user_token(user_id) if user_id is not None else await cls._get_token()
-            return await cls._request_method_post(url, body, cls._get_auth(token))
+            return await cls._request_method_post(url, body, cls._get_auth(token), user_id, retry + 1)
         await cls._raise_for_status(response)
         return response
 
@@ -152,4 +154,3 @@ class OuroInvestApiTransport:
             raise OuroInvestErrorReturn(f"Status: {response.status};\n"
                                         f"Reason: {response.reason};\n"
                                         f"Content: {message.decode()}.")
-

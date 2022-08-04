@@ -209,15 +209,16 @@ fake_client = AsyncMock()
 @patch.object(OuroInvestApiTransport, "_raise_for_status", return_value=fake_client)
 async def test_request_method_get(mocked_raise, mocked_session, mocked_token, mocked_auth, monkeypatch):
     monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
-    fake_client.get.return_value = dummy_response
-    dummy_response.status = 200
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
+    _dummy_response = MagicMock(status=200)
+    fake_client.get = AsyncMock(return_value=_dummy_response)
     response = await OuroInvestApiTransport._request_method_get(dummy_url, dummy_auth)
     mocked_session.assert_called_once_with()
     fake_client.get.assert_called_once_with(dummy_url, headers=dummy_auth, json=None)
-    assert response == dummy_response
+    assert response == _dummy_response
     mocked_token.assert_not_called()
     mocked_auth.assert_not_called()
-    mocked_raise.assert_called_once_with(dummy_response)
+    mocked_raise.assert_called_once_with(_dummy_response)
 
 
 @pytest.mark.asyncio
@@ -227,15 +228,16 @@ async def test_request_method_get(mocked_raise, mocked_session, mocked_token, mo
 @patch.object(OuroInvestApiTransport, "_raise_for_status", return_value=fake_client)
 async def test_request_method_post(mocked_raise, mocked_session, mocked_token, mocked_auth, monkeypatch):
     monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
-    fake_client.post.return_value = dummy_response
-    dummy_response.status = 200
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
+    _dummy_response = MagicMock(status=200)
+    fake_client.post = AsyncMock(return_value=_dummy_response)
     response = await OuroInvestApiTransport._request_method_post(dummy_url, dummy_body)
     mocked_session.assert_called_once_with()
     fake_client.post.assert_called_once_with(dummy_url, headers=None, json=dummy_body)
-    assert response == dummy_response
+    assert response == _dummy_response
     mocked_token.assert_not_called()
     mocked_auth.assert_not_called()
-    mocked_raise.assert_called_once_with(dummy_response)
+    mocked_raise.assert_called_once_with(_dummy_response)
 
 
 async def return_response(url, headers, json):
@@ -251,15 +253,17 @@ async def return_response(url, headers, json):
 @patch.object(OuroInvestApiTransport, "_raise_for_status", return_value=fake_client)
 async def test_request_method_get_forbidden(mocked_raise, mocked_user_token, mocked_session, mocked_token,
                                             mocked_auth, monkeypatch):
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
     monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
-    fake_client.get = return_response
+    _dummy_response = MagicMock(status=200)
+    fake_client.get = AsyncMock(side_effect=[MagicMock(status=403), _dummy_response])
     response = await OuroInvestApiTransport._request_method_get(dummy_url, dummy_auth, dummy_body)
     mocked_session.assert_has_calls((call(), call()))
-    assert response == dummy_response
+    assert response == _dummy_response
     mocked_user_token.assert_not_called()
     mocked_token.assert_called_once_with()
     mocked_auth.assert_called_once_with(dummy_token)
-    mocked_raise.assert_called_once_with(dummy_response)
+    mocked_raise.assert_called_once_with(_dummy_response)
 
 
 @pytest.mark.asyncio
@@ -270,15 +274,17 @@ async def test_request_method_get_forbidden(mocked_raise, mocked_user_token, moc
 @patch.object(OuroInvestApiTransport, "_raise_for_status", return_value=fake_client)
 async def test_request_method_get_forbidden_user_token(mocked_raise, mocked_user_token, mocked_session, mocked_token,
                                                        mocked_auth, monkeypatch):
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
     monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
-    fake_client.get = return_response
+    _dummy_response = MagicMock(status=200)
+    fake_client.get = AsyncMock(side_effect=[MagicMock(status=403), _dummy_response])
     response = await OuroInvestApiTransport._request_method_get(dummy_url, dummy_auth, dummy_body, dummy_user_id)
     mocked_session.assert_has_calls((call(), call()))
-    assert response == dummy_response
+    assert response == _dummy_response
     mocked_user_token.assert_called_once_with(dummy_user_id)
     mocked_token.assert_not_called()
     mocked_auth.assert_called_once_with(dummy_token)
-    mocked_raise.assert_called_once_with(dummy_response)
+    mocked_raise.assert_called_once_with(_dummy_response)
 
 
 @pytest.mark.asyncio
@@ -289,14 +295,16 @@ async def test_request_method_get_forbidden_user_token(mocked_raise, mocked_user
 @patch.object(OuroInvestApiTransport, "_raise_for_status", return_value=fake_client)
 async def test_request_method_post_forbidden(mocked_raise, mocked_user_token, mocked_session, mocked_token, mocked_auth, monkeypatch):
     monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
-    fake_client.post = return_response
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
+    _dummy_response = MagicMock(status=200)
+    fake_client.post = AsyncMock(side_effect=[MagicMock(status=403), _dummy_response])
     response = await OuroInvestApiTransport._request_method_post(dummy_url, dummy_auth, dummy_body)
     mocked_session.assert_has_calls((call(), call()))
-    assert response == dummy_response
+    assert response == _dummy_response
     mocked_user_token.assert_not_called()
     mocked_token.assert_called_once_with()
     mocked_auth.assert_called_once_with(dummy_token)
-    mocked_raise.assert_called_once_with(dummy_response)
+    mocked_raise.assert_called_once_with(_dummy_response)
 
 
 @pytest.mark.asyncio
@@ -307,14 +315,58 @@ async def test_request_method_post_forbidden(mocked_raise, mocked_user_token, mo
 @patch.object(OuroInvestApiTransport, "_raise_for_status", return_value=fake_client)
 async def test_request_method_post_forbidden_user_token(mocked_raise, mocked_user_token, mocked_session, mocked_token,
                                                         mocked_auth, monkeypatch):
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
     monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
-    fake_client.post = return_response
+    _dummy_response = MagicMock(status=200)
+    fake_client.post = AsyncMock(side_effect=[MagicMock(status=403), _dummy_response])
     response = await OuroInvestApiTransport._request_method_post(dummy_url, dummy_auth, dummy_body, dummy_user_id)
     mocked_session.assert_has_calls((call(), call()))
-    assert response == dummy_response
+    assert response == _dummy_response
     mocked_user_token.assert_called_once_with(dummy_user_id)
     mocked_token.assert_not_called()
     mocked_auth.assert_called_once_with(dummy_token)
+    mocked_raise.assert_called_once_with(_dummy_response)
+
+
+@pytest.mark.asyncio
+@patch.object(OuroInvestApiTransport, "_get_auth", return_value=dummy_token)
+@patch.object(OuroInvestApiTransport, "_get_token", return_value=dummy_token)
+@patch.object(OuroInvestApiTransport, "_get_session", return_value=fake_client)
+@patch.object(OuroInvestApiTransport, "_get_user_token", return_value=dummy_token)
+@patch.object(OuroInvestApiTransport, "_raise_for_status", side_effect=OuroInvestErrorReturn())
+async def test_request_method_post_max_retries(mocked_raise, mocked_user_token, mocked_session, mocked_token,
+                                               mocked_auth, monkeypatch):
+    monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
+    dummy_response.status = 403
+    fake_client.post = AsyncMock(side_effect=[dummy_response]*3)
+    with pytest.raises(OuroInvestErrorReturn):
+        await OuroInvestApiTransport._request_method_post(dummy_url, dummy_auth, dummy_body)
+    assert mocked_session.mock_calls.count(call()) == 3
+    mocked_user_token.assert_not_called()
+    assert mocked_token.mock_calls.count(call()) == 2
+    assert mocked_auth.mock_calls.count(call(dummy_token)) == 2
+    mocked_raise.assert_called_once_with(dummy_response)
+
+
+@pytest.mark.asyncio
+@patch.object(OuroInvestApiTransport, "_get_auth", return_value=dummy_token)
+@patch.object(OuroInvestApiTransport, "_get_token", return_value=dummy_token)
+@patch.object(OuroInvestApiTransport, "_get_session", return_value=fake_client)
+@patch.object(OuroInvestApiTransport, "_get_user_token", return_value=dummy_token)
+@patch.object(OuroInvestApiTransport, "_raise_for_status", side_effect=OuroInvestErrorReturn())
+async def test_request_method_get_max_retries(mocked_raise, mocked_user_token, mocked_session, mocked_token,
+                                              mocked_auth, monkeypatch):
+    monkeypatch.setattr(OuroInvestApiTransport, "cache", fake_cache)
+    monkeypatch.setattr(OuroInvestApiTransport, "MAX_RETRY", "2")
+    dummy_response.status = 403
+    fake_client.get = AsyncMock(side_effect=[dummy_response]*3)
+    with pytest.raises(OuroInvestErrorReturn):
+        await OuroInvestApiTransport._request_method_get(dummy_url, dummy_body, dummy_auth)
+    assert mocked_session.mock_calls.count(call()) == 3
+    mocked_user_token.assert_not_called()
+    assert mocked_token.mock_calls.count(call()) == 2
+    assert mocked_auth.mock_calls.count(call(dummy_token)) == 2
     mocked_raise.assert_called_once_with(dummy_response)
 
 
