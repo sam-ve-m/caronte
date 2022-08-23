@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "caronte"
-version = "0.0.0"
+version = "0.0.1"
 description = ""
 authors = ["Sam <svm@lionx.com.br>"]
 
