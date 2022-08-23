@@ -3,7 +3,7 @@ from typing import Optional, Union
 import orjson
 
 from caronte.src.infrastructures.env_config import config
-from caronte.src.infrastructures.redis.infrastructure import RedisInfrastructure
+from caronte.src.infrastructures.redis.client.infrastructure import RedisInfrastructure
 
 
 class Cache(RedisInfrastructure):

@@ -24,3 +24,16 @@ class OuroInvestApiTransport:
                 await TokenService.delete_default_token()
                 counter += 1
         raise OuroInvestUnauthorizedToken()
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    asyncio.run(
+        OuroInvestApiTransport.request(
+            method=HTTPMethods.POST,
+            url="https://teste",
+            user_id=123,
+            body={}
+        )
+    )

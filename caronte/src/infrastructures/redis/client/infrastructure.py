@@ -1,4 +1,4 @@
-import aioredis
+import redis.asyncio as aioredis
 from caronte.src.infrastructures.env_config import config
 
 

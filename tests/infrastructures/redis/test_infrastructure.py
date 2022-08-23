@@ -6,7 +6,7 @@ from decouple import Config, RepositoryEnv
 with patch.object(RepositoryEnv, "__init__", return_value=None):
     with patch.object(Config, "__init__", return_value=None):
         with patch.object(Config, "__call__", return_value="ENV_VALUE{}"):
-            from caronte.src.infrastructures.redis.infrastructure import RedisInfrastructure
+            from caronte.src.infrastructures.redis.client.infrastructure import RedisInfrastructure
 
 dummy_connection = "dummy connection"
 
