@@ -1,6 +1,3 @@
-# OUTSIDE LIBRARIES
-from typing import Type
-
 from aioredlock import Aioredlock
 
 # Jotunheimr

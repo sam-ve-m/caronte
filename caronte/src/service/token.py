@@ -21,7 +21,7 @@ class TokenService:
         token = await cls.cache.get(default_token_cache_key)
         if not token:
             hash = "default_token"
-            async with cls._lock_token_generation(cls, hash=hash) as _:
+            async with cls._lock_token_generation(hash=hash) as _:
                 await cls.cache.delete_folder(cls._base_tokens_cache_folder())
                 token = await cls._request_new_token()
                 await cls.cache.set(default_token_cache_key, token, 12 * 60 * 60)
@@ -34,7 +34,8 @@ class TokenService:
         user_token = await cls.cache.get(user_token_cache_key)
         if not user_token:
             hash = f"cleinte:{client_code}"
-            async with cls._lock_token_generation(cls, hash=hash) as _:
+
+            async with cls._lock_token_generation(hash=hash) as _:
                 user_token = await cls._request_new_user_token(client_code, default_token)
                 await cls.cache.set(user_token_cache_key, user_token, 12 * 60 * 60)
         return user_token
