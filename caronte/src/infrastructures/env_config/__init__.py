@@ -2,9 +2,6 @@ import os
 import platform
 from decouple import Config, RepositoryEnv
 
-config = None
-SYSTEM = platform.system()
-
 
 def get_config(base_path: str) -> Config:
     path = os.path.join(base_path, "opt", "envs", "caronte.lionx.com.br", ".env")
@@ -13,11 +10,14 @@ def get_config(base_path: str) -> Config:
     return config
 
 
-if SYSTEM == "Linux":
-    config = get_config("/")
-elif SYSTEM == "Windows":
-    config = get_config("C:/")
-else:
-    raise Exception("Unsupported system")
+SYSTEM = platform.system()
+supported_systems = {
+    "Linux": "/",
+    "Darwin": "/",
+    "Windows": "C:/",
+}
 
-__all__ = ["config"]
+base_path = supported_systems.get(SYSTEM)
+config = get_config(base_path)
+
+__all__ = config
