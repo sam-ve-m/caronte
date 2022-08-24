@@ -104,3 +104,4 @@ class TokenService:
     @staticmethod
     def _get_auth(token) -> dict:
         return {"Authorization": f"Bearer {token}"}
+    

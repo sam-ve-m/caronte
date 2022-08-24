@@ -11,7 +11,7 @@ class HTTPTransport:
     session = None
 
     @classmethod
-    async def request_method(cls, method: HTTPMethods, url: str, body: dict, headers: dict) -> ClientResponse:
+    async def request_method(cls, method: HTTPMethods, url: str, body: dict, headers: dict = None) -> ClientResponse:
         if body:
             body.update(cls._get_control())
         session = await cls._get_session()
