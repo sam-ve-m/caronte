@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "caronte"
-version = "0.0.0"
+version = "0.0.1"
 description = ""
 authors = ["Sam <svm@lionx.com.br>"]
 
@@ -11,7 +11,8 @@ etria-logger = "^0.1.9"
 orjson = "^3.6.8"
 nidavellir = "0.1.0"
 python-decouple = "^3.6"
-aioredis = "^2.0.1"
+redis = "^4.3.4"
+aioredlock = "^0.7.3"
 
 [tool.poetry.dev-dependencies]
 

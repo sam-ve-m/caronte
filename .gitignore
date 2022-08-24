@@ -7,11 +7,15 @@
 node_modules/
 dist/
 
+# Virtual Env
+venv/
+
 # Compiled Java class files
 *.class
 
 # Compiled Python bytecode
 *.py[cod]
+*.pyc
 
 # Log files
 *.log
