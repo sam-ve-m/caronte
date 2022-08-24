@@ -25,7 +25,6 @@ class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
         lock_balance = (False, LockAuthenticationStatus.INTERNAL_SERVER_ERROR.value, None)
         red_lock_manager: Aioredlock = cls.get_red_lock_manager()
         lock_balance_key = None
-        lock = None
 
         try:
             lock = await red_lock_manager.lock(

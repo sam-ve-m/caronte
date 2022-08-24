@@ -1,10 +1,9 @@
 from aiohttp import ClientSession, ClientResponse
 from http import HTTPStatus
 
-from caronte import OuroInvestErrorReturn
 from caronte.src.domain.enum import HTTPMethods
-from caronte.src.domain.exceptions import OuroInvestUnauthorizedToken
 from caronte.src.infrastructures.env_config import config
+from caronte.src.domain.exceptions import OuroInvestUnauthorizedToken, OuroInvestErrorReturn
 
 
 class HTTPTransport:
