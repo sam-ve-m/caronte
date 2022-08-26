@@ -26,16 +26,4 @@ class OuroInvestApiTransport:
         raise OuroInvestUnauthorizedToken()
 
 
-if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(
-        OuroInvestApiTransport.request(
-            method=HTTPMethods.POST,
-            url="https://teste",
-            user_id=123,
-            body={}
-        )
-    )
-
 __all__ = [OuroInvestErrorReturn, OuroInvestUnauthorizedToken, HTTPMethods, OuroInvestApiTransport]
