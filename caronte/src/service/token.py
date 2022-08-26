@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 from etria_logger import Gladsheim
 
-from caronte.src.domain.enum import HTTPMethods
+from caronte.src.domain.enum import AllowedHTTPMethods
 from caronte.src.domain.models.authentication.response.model import LockAuthenticationStatus
 from caronte.src.infrastructures.env_config import config
 from caronte.src.repositories.authentication.distribuited_lock_manager.repository import \
@@ -67,7 +67,7 @@ class TokenService:
         body = {
             "chave": config("OUROINVEST_SYSTEM_USER"), "senha": config("OUROINVEST_SYSTEM_PWD")}
         response = await HTTPTransport.request_method(
-            method=HTTPMethods.POST,
+            method=AllowedHTTPMethods.POST,
             url=config("OUROINVEST_DEFAULT_TOKEN_URL"),
             body=body
         )
@@ -79,7 +79,7 @@ class TokenService:
     async def _request_new_user_token(cls, client_code: int, auth: dict) -> dict:
         body = {"codigoCliente": client_code}
         response = await HTTPTransport.request_method(
-            method=HTTPMethods.POST,
+            method=AllowedHTTPMethods.POST,
             url=config("OUROINVEST_USER_TOKEN_URL"),
             body=body,
             headers=auth
