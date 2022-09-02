@@ -75,9 +75,9 @@ class TokenService:
                     lock=lock
                 )
 
-    @classmethod
-    async def delete_default_token(cls):
-        await cls.cache.delete(cls._default_token_cache_key())
+    # @classmethod
+    # async def delete_default_token(cls):
+    #     await cls.cache.delete(cls._default_token_cache_key())  # TODO: Validar necessidade
 
     @classmethod
     async def _request_new_token(cls) -> dict:

@@ -22,6 +22,7 @@ class ExchangeCompanyApi:
             )
             return response
         except TokenNotFoundInContent as ex:
+            # await TokenService.delete_default_token()
             Gladsheim.info(message=ex.msg)
             return CaronteStatusResponse((False, CaronteStatus.TOKEN_NOT_FOUND, None))
         except Exception as ex:

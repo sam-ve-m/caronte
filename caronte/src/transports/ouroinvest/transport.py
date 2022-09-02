@@ -5,7 +5,6 @@ from caronte.src.domain.models.authentication.response.model import (
 from caronte.src.domain.enums.http_methods import AllowedHTTPMethods
 from caronte.src.domain.enums.response import CaronteStatus
 from caronte.src.infrastructures.env_config import config
-from caronte.src.service.token import TokenService
 
 # Standards
 from http import HTTPStatus
@@ -75,7 +74,6 @@ class HTTPTransport:
 
     @staticmethod
     async def __when_forbidden_status(response: ClientResponse) -> CaronteStatusResponse:
-        await TokenService.delete_default_token()
         message = await response.content.read()
         Gladsheim.info(
             status=response.status, reason=response.reason, content=message.decode()
