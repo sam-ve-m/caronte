@@ -1,6 +1,11 @@
-from enum import Enum
-from typing import NewType, Tuple
+# Caronte
+from caronte.src.domain.enums.response import CaronteStatus
 
+# Standards
+from enum import Enum
+from typing import NewType, Tuple, Union
+
+# Third party
 from aioredlock import Lock
 
 
@@ -20,6 +25,9 @@ class UnlockAuthenticationStatus(Enum):
     INTERNAL_SERVER_ERROR = 4
 
 
+CaronteStatusResponse = NewType(
+    "CaronteStatusResponse", Tuple[bool, CaronteStatus, Union[dict, None]]
+)
 LockAuthenticationResponse = NewType(
     "LockAuthenticationResponse", Tuple[bool, LockAuthenticationStatus, Lock]
 )

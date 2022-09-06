@@ -5,10 +5,16 @@ from aioredlock import LockError, Aioredlock, LockAcquiringError, LockRuntimeErr
 
 from etria_logger import Gladsheim
 
-from caronte.src.domain.models.authentication.response.model import LockAuthenticationResponse, LockAuthenticationStatus, \
-    UnlockAuthenticationResponse, UnlockAuthenticationStatus
+from caronte.src.domain.models.authentication.response.model import (
+    LockAuthenticationResponse,
+    LockAuthenticationStatus,
+    UnlockAuthenticationResponse,
+    UnlockAuthenticationStatus,
+)
 from caronte.src.infrastructures.env_config import config
-from caronte.src.infrastructures.redis.distribuited_lock_manager.infrastructure import RedLockManagerInfrastructure
+from caronte.src.infrastructures.redis.distribuited_lock_manager.infrastructure import (
+    RedLockManagerInfrastructure,
+)
 
 
 class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
@@ -18,11 +24,17 @@ class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
     retry_delay_min = config("CARONTE_CLIENT_AUTHENTICATION_RETRY_DELAY_MIN")
     retry_delay_max = config("CARONTE_CLIENT_AUTHENTICATION_RETRY_DELAY_MAX")
     lock_time_out = config("CARONTE_CLIENT_AUTHENTICATION_LOCK_MANAGER_TIMEOUT")
-    distributed_lock_manager_identifier = config("CARONTE_CLIENT_AUTHENTICATION_LOCK_MANAGER_IDENTIFIER")
+    distributed_lock_manager_identifier = config(
+        "CARONTE_CLIENT_AUTHENTICATION_LOCK_MANAGER_IDENTIFIER"
+    )
 
     @classmethod
     async def lock_authentication(cls, hash: str) -> LockAuthenticationResponse:
-        lock_balance = (False, LockAuthenticationStatus.INTERNAL_SERVER_ERROR.value, None)
+        lock_balance = (
+            False,
+            LockAuthenticationStatus.INTERNAL_SERVER_ERROR.value,
+            None,
+        )
         red_lock_manager: Aioredlock = cls.get_red_lock_manager()
         lock_balance_key = None
 
@@ -71,7 +83,10 @@ class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
 
     @classmethod
     async def unlock_authentication(cls, lock: Lock) -> UnlockAuthenticationResponse:
-        unlock_balance_response = (False, UnlockAuthenticationStatus.INTERNAL_LOCK_ERROR)
+        unlock_balance_response = (
+            False,
+            UnlockAuthenticationStatus.INTERNAL_LOCK_ERROR,
+        )
         try:
             red_lock_manager: Aioredlock = cls.get_red_lock_manager()
             await red_lock_manager.unlock(lock)
@@ -83,7 +98,10 @@ class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
                 f" lock due to an unexpected event",
                 error=error,
             )
-            unlock_balance_response = (False, UnlockAuthenticationStatus.RUNTIME_LOCK_ERROR)
+            unlock_balance_response = (
+                False,
+                UnlockAuthenticationStatus.RUNTIME_LOCK_ERROR,
+            )
 
         except LockError as error:
             Gladsheim.error(
@@ -91,14 +109,20 @@ class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
                 f" lock",
                 error=error,
             )
-            unlock_balance_response = (False, UnlockAuthenticationStatus.INTERNAL_LOCK_ERROR)
+            unlock_balance_response = (
+                False,
+                UnlockAuthenticationStatus.INTERNAL_LOCK_ERROR,
+            )
 
         except Exception as error:
             Gladsheim.error(
                 message=f"{cls.__class__}::unlock_balance::Error in releasing the balance resource",
                 error=error,
             )
-            unlock_balance_response = (False, UnlockAuthenticationStatus.INTERNAL_SERVER_ERROR)
+            unlock_balance_response = (
+                False,
+                UnlockAuthenticationStatus.INTERNAL_SERVER_ERROR,
+            )
 
         finally:
             return UnlockAuthenticationResponse(unlock_balance_response)
