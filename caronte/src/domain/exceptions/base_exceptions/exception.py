@@ -1,15 +1,26 @@
 class DomainException(Exception):
-    pass
+    def __init__(self, msg, code, *args, **kwargs):
+        self.msg = msg
+        self.code = code
+        super().__init__(args, kwargs)
 
 
 class RepositoryException(Exception):
-    pass
+    def __init__(self, msg, code, *args, **kwargs):
+        self.msg = msg
+        self.code = code
+        super().__init__(args, kwargs)
 
 
 class ServiceException(Exception):
-    pass
+    def __init__(self, msg, code, *args, **kwargs):
+        self.msg = msg
+        self.code = code
+        super().__init__(args, kwargs)
 
 
 class TransportException(Exception):
-    pass
-
+    def __init__(self, msg, code, *args, **kwargs):
+        self.msg = msg
+        self.code = code
+        super().__init__(args, kwargs)

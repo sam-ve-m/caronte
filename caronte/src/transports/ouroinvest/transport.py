@@ -30,7 +30,7 @@ class HTTPTransport:
 
     @staticmethod
     def __get_control():
-        controle = {
+        control = {
             "controle": {
                 "dataHoraCliente": config(
                     "OUROINVEST_CONTROLE_DATAHORACLIENTE"
@@ -46,7 +46,7 @@ class HTTPTransport:
                 },
             }
         }
-        return controle
+        return control
 
     @classmethod
     async def __get_session(cls) -> ClientSession:
