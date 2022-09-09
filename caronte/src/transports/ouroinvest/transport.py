@@ -58,7 +58,7 @@ class HTTPTransport:
     async def __map_response(cls, response: ClientResponse) -> CaronteStatusResponse:
         possibilities_response_map = {
             HTTPStatus.OK: cls.__when_success_status,
-            HTTPStatus.BAD_REQUEST: cls.__when_forbidden_status,
+            HTTPStatus.BAD_REQUEST: cls.__when_bad_request_status,
             CaronteStatus.UNEXPECTED_ERROR: cls.__when_unexpected_error,
         }
         response_function = possibilities_response_map.get(
@@ -73,7 +73,7 @@ class HTTPTransport:
         return CaronteStatusResponse((True, CaronteStatus.SUCCESS, content))
 
     @staticmethod
-    async def __when_forbidden_status(response: ClientResponse) -> CaronteStatusResponse:
+    async def __when_bad_request_status(response: ClientResponse) -> CaronteStatusResponse:
         message = await response.content.read()
         Gladsheim.info(
             status=response.status, reason=response.reason, content=message.decode()
