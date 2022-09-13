@@ -59,6 +59,8 @@ class HTTPTransport:
         possibilities_response_map = {
             HTTPStatus.OK: cls.__when_success_status,
             HTTPStatus.BAD_REQUEST: cls.__when_bad_request_status,
+            HTTPStatus.FORBIDDEN: cls.__when_forbidden_status,
+            HTTPStatus.UNAUTHORIZED: cls.__when_unauthorized_status,
             CaronteStatus.UNEXPECTED_ERROR: cls.__when_unexpected_error,
         }
         response_function = possibilities_response_map.get(
@@ -79,6 +81,22 @@ class HTTPTransport:
             status=response.status, reason=response.reason, content=message.decode()
         )
         return CaronteStatusResponse((False, CaronteStatus.BAD_REQUEST, None))
+
+    @staticmethod
+    async def __when_forbidden_status(response: ClientResponse) -> CaronteStatusResponse:
+        message = await response.content.read()
+        Gladsheim.info(
+            status=response.status, reason=response.reason, content=message.decode()
+        )
+        return CaronteStatusResponse((False, CaronteStatus.FORBIDDEN, None))
+
+    @staticmethod
+    async def __when_unauthorized_status(response: ClientResponse) -> CaronteStatusResponse:
+        message = await response.content.read()
+        Gladsheim.info(
+            status=response.status, reason=response.reason, content=message.decode()
+        )
+        return CaronteStatusResponse((False, CaronteStatus.UNAUTHORIZED, None))
 
     @staticmethod
     async def __when_unexpected_error(response: ClientResponse) -> CaronteStatusResponse:
