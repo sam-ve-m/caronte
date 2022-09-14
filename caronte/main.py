@@ -2,7 +2,6 @@
 from caronte.src.domain.enums.http_methods import AllowedHTTPMethods
 from caronte.src.domain.enums.response import CaronteStatus
 from caronte.src.domain.exceptions.base_exceptions.exception import ServiceException
-from caronte.src.domain.exceptions.service.exception import TokenNotFoundInContent
 from caronte.src.domain.models.authentication.response.model import CaronteStatusResponse
 from caronte.src.service.token import TokenService
 from caronte.src.transports.ouroinvest.transport import HTTPTransport
