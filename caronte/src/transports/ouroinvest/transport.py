@@ -8,10 +8,12 @@ from caronte.src.infrastructures.env_config import config
 
 # Standards
 from http import HTTPStatus
+from datetime import datetime
 
 # Third party
 from aiohttp import ClientSession, ClientResponse
 from etria_logger import Gladsheim
+from pytz import timezone
 
 
 class HTTPTransport:
@@ -32,9 +34,7 @@ class HTTPTransport:
     def __get_control():
         control = {
             "controle": {
-                "dataHoraCliente": config(
-                    "OUROINVEST_CONTROLE_DATAHORACLIENTE"
-                ),  # TODO: Estudar se será um datetime.now()
+                "dataHoraCliente": datetime.now(tz=timezone("America/Sao_Paulo")),
                 "recurso": {
                     "codigo": config("OUROINVEST_CONTROLE_RECURSO_CODIGO"),
                     "sigla": config("OUROINVEST_CONTROLE_RECURSO_SIGLA"),

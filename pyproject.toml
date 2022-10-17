@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "caronte"
-version = "0.2.2"
+version = "0.2.3"
 description = ""
 authors = ["Sam <svm@lionx.com.br>"]
 
@@ -13,6 +13,7 @@ nidavellir = "0.1.0"
 python-decouple = "^3.6"
 redis = "^4.3.4"
 aioredlock = "^0.7.3"
+pytz = "^2022.4"
 
 [tool.poetry.dev-dependencies]
 
