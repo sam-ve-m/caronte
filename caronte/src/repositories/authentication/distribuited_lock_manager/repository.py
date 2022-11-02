@@ -1,4 +1,5 @@
 from asyncio import Lock
+from uuid import uuid4
 
 from aioredlock import LockError, Aioredlock, LockAcquiringError, LockRuntimeError
 
@@ -24,9 +25,7 @@ class AuthenticationLockManagerRepository(RedLockManagerInfrastructure):
     retry_delay_min = config("CARONTE_CLIENT_AUTHENTICATION_RETRY_DELAY_MIN")
     retry_delay_max = config("CARONTE_CLIENT_AUTHENTICATION_RETRY_DELAY_MAX")
     lock_time_out = config("CARONTE_CLIENT_AUTHENTICATION_LOCK_MANAGER_TIMEOUT")
-    distributed_lock_manager_identifier = config(
-        "CARONTE_CLIENT_AUTHENTICATION_LOCK_MANAGER_IDENTIFIER"
-    )
+    distributed_lock_manager_identifier = f"{config('CARONTE_CLIENT_AUTHENTICATION_LOCK_MANAGER_IDENTIFIER')}-{str(uuid4())}"
 
     @classmethod
     async def lock_authentication(cls, hash: str) -> LockAuthenticationResponse:
