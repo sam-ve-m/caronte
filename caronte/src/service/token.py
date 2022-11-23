@@ -28,8 +28,9 @@ class TokenService:
         token = await cls.cache.get(default_token_cache_key)
         if not token:
             hash = "default_token"
-            async with cls._lock_token_generation(hash=hash, cache_key=default_token_cache_key) as lock:
-                if lock:
+            async with cls._lock_token_generation(hash=hash) as lock:
+                token = await cls.cache.get(default_token_cache_key)
+                if token is None:
                     await cls.cache.delete_folder(cls._base_tokens_cache_folder())
                     token = await cls._request_new_token()
                     await cls.cache.set(default_token_cache_key, token, 12 * 60 * 60)
@@ -43,8 +44,9 @@ class TokenService:
         user_token = await cls.cache.get(user_token_cache_key)
         if not user_token:
             hash = f"cliente:{exchange_account_id}"
-            async with cls._lock_token_generation(hash=hash, cache_key=user_token_cache_key) as lock:
-                if lock:
+            async with cls._lock_token_generation(hash=hash) as lock:
+                user_token = await cls.cache.get(user_token_cache_key)
+                if user_token is None:
                     user_token = await cls._request_new_user_token(
                         exchange_account_id, default_token
                     )
@@ -54,13 +56,10 @@ class TokenService:
 
     @classmethod
     @asynccontextmanager
-    async def _lock_token_generation(cls, hash: str, cache_key: str):
+    async def _lock_token_generation(cls, hash: str):
         lock = None
         try:
             while True:
-                if await cls.cache.get(cache_key):
-                    yield lock
-                    break
                 (
                     call_status,
                     status,
@@ -71,7 +70,6 @@ class TokenService:
                 if status == LockAuthenticationStatus.SUCCESS:
                     yield lock
                     break
-                await asyncio.sleep(1)
         except Exception as err:
             message = f"{cls.__class__}:validate_token_redis:Error - {err}"
             Gladsheim.error(error=err, message=message)
