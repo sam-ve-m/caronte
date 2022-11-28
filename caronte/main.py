@@ -39,12 +39,12 @@ class ExchangeCompanyApi:
         cls,
         method: AllowedHTTPMethods,
         url: str,
-        exchange_account_id: int,
+        client_id: int,
         body: dict = None,
     ) -> CaronteStatusResponse:
         try:
             headers = await TokenService.get_user_token(
-                exchange_account_id=exchange_account_id
+                client_id=client_id
             )
             response = await HTTPTransport.request_method(
                 method=method, url=url, body=body, headers=headers

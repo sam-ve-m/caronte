@@ -38,12 +38,12 @@ class TokenService:
         return token
 
     @classmethod
-    async def get_user_token(cls, exchange_account_id: int) -> dict:
-        user_token_cache_key = cls._user_token_cache_key_format(exchange_account_id)
+    async def get_user_token(cls, client_id: int) -> dict:
+        user_token_cache_key = cls._user_token_cache_key_format(client_id)
         default_token = await cls.get_company_token()
         user_token = await cls.cache.get(user_token_cache_key)
         if not user_token:
-            hash = f"cliente:{exchange_account_id}"
+            hash = f"cliente:{client_id}"
             async with cls._lock_token_generation(hash=hash) as lock:
                 user_token = await cls.cache.get(user_token_cache_key)
                 if user_token is None:
@@ -79,10 +79,6 @@ class TokenService:
                     lock=lock
                 )
 
-    # @classmethod
-    # async def delete_default_token(cls):
-    #     await cls.cache.delete(cls._default_token_cache_key())  # TODO: Validar necessidade
-
     @classmethod
     async def _request_new_token(cls) -> dict:
         body = {
@@ -101,8 +97,8 @@ class TokenService:
         return cls._get_auth(token)
 
     @classmethod
-    async def _request_new_user_token(cls, client_code: int, auth: dict) -> dict:
-        body = {"codigoCliente": client_code}
+    async def _request_new_user_token(cls, client_id: int, auth: dict) -> dict:
+        body = {"codigoCliente": client_id}
         success, caronte_status, content = await HTTPTransport.request_method(
             method=AllowedHTTPMethods.POST,
             url=config("OUROINVEST_USER_TOKEN_URL"),
@@ -125,11 +121,11 @@ class TokenService:
         )
 
     @classmethod
-    def _user_token_cache_key_format(cls, client_code: int):
+    def _user_token_cache_key_format(cls, client_id: int):
         url = cls._base_tokens_cache_folder() + config(
             "OUROINVEST_USER_TOKEN_CACHE_KEY"
         )
-        url = url.format(client_code)
+        url = url.format(client_id)
         return url
 
     @staticmethod
