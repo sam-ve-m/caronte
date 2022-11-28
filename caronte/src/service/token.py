@@ -48,7 +48,7 @@ class TokenService:
                 user_token = await cls.cache.get(user_token_cache_key)
                 if user_token is None:
                     user_token = await cls._request_new_user_token(
-                        exchange_account_id, default_token
+                        client_id, default_token
                     )
                     await cls.cache.set(user_token_cache_key, user_token, 12 * 60 * 60)
             user_token = await cls.cache.get(user_token_cache_key)
